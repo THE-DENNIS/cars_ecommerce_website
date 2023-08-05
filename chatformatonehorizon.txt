@@ -1,0 +1,153 @@
+<?php
+session_start();
+  require_once("partials/header.php");
+  require_once("classes/Message.php");
+     $mg =new Message();
+
+    if(isset($_GET['id'])){
+      $receiver_id= $_GET['id'];
+    } 
+       
+    
+    
+    $sender_id = $_SESSION["user_id"];
+
+
+
+
+?>
+  <div class="container" style="background-color:skyblue">
+    
+  <div class="row">
+      <div class="col-md-5">
+          <div class="card" style="width: 14rem;">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            </div>
+          </div>
+      </div>
+      <div class="col-md-5">
+          
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+          
+      </div>
+      <div class="col-md-5">
+      <div class="card" style="width: 14rem;">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            </div>
+          </div>
+      </div>
+    </div>
+     
+    
+    
+    
+    
+    
+    <div class="row">
+        <div class="col-md-6 align-center">
+          <form class="form-control moves" method="POST" action="process/chatboxprocess.php">
+          
+                <div class="mb-1">
+                  <textarea class="form-control" name="message" placeholder="Type your message..."></textarea>
+                </div>
+                <input type="hidden" value="<?php echo $sender_id; ?>" name="sender_id">
+                <input type="hidden" value="<?php echo $receiver_id; ?>" name="receiver_id">
+                
+              <div class=" row justify-content-end my-2">
+              <button class="btn-edit-profile justify-content-end" name="send">send</button>
+              </div>
+          </form>
+        </div>
+      </div>           
+
+      
+    </div>        
+  
+
+<?php
+  require_once("partials/footer.php");
+?>
+
+
+
+
+
+
+process
+<?php
+session_start();
+require_once("../classes/Message.php");
+if($_POST){
+    if(isset($_POST["send"])){
+        $msg= $_POST["message"];
+        $sender= $_POST["sender_id"];
+        $receiver= $_POST["receiver_id"];
+       
+       //validate empty fields
+     if(empty($msg)){
+        echo "You didn't type anything";
+        exit;
+        }
+       
+
+         //instantiate the class and call the register method
+      $userone = new Message();
+      $response =$userone->insertMessage($msg, $sender, $receiver);
+      echo $response;
+
+    
+    
+    }
+}
+
+
+?>
+
+
+
+
+
+
+
+
+
+<?php 
+require_once("db.php");
+class Message extends Db{
+    private $conn;
+  
+    public function __construct(){
+     $this->conn = $this->connect();
+    }
+
+ public function insertMessage($message, $sender, $receiver){
+    //email does not exit now insert into database
+   $sql = "INSERT INTO message( message, sender_id, receiver_id)
+   VALUES(?, ?, ?)";
+
+   $stmt = $this->conn->prepare($sql);
+   $user = $stmt->execute([$message, $sender, $receiver]);
+   // print_r($user);
+   // exit();
+  if($user){
+     return "Message sent successfully";
+  }else{
+     return "Resend message";
+  }
+ 
+ 
+ }
+
+
+}
+
+
+?>
